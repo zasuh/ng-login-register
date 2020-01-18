@@ -4,11 +4,15 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { RegisterComponent } from './register/register.component';
+import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    RegisterComponent
+    RegisterComponent,
+    HomeComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -16,6 +20,6 @@ import { RegisterComponent } from './register/register.component';
   ],
   providers: [],
   bootstrap: [AppComponent],
-  exports: [RegisterComponent]
+  exports: [RegisterComponent, HomeComponent, LoginComponent]
 })
 export class AppModule { }
