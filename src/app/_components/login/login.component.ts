@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   submitted = false;
   returnUrl: string;
   error: string;
+  success: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -36,6 +37,10 @@ export class LoginComponent implements OnInit {
 
     // get return url from route parameters or default to '/'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+
+    if (this.route.snapshot.queryParams['registered']) {
+      this.success = 'Registration successful';
+    }
   }
 
   // convenience getter for easy access to form fields
@@ -43,6 +48,9 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
       this.submitted = true;
+
+      this.error = null;
+      this.success = null;
 
       // stop here if form is invalid
       if (this.loginForm.invalid) {
