@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthenticationService } from 'src/app/_services/authentication.service';
+import { AuthenticationService, AlertService } from 'src/app/_services';
 import { first } from 'rxjs/operators';
 
 @Component({
@@ -14,33 +14,28 @@ export class LoginComponent implements OnInit {
   loading = false;
   submitted = false;
   returnUrl: string;
-  error: string;
-  success: string;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private authenticationService: AuthenticationService
+      private formBuilder: FormBuilder,
+      private route: ActivatedRoute,
+      private router: Router,
+      private authenticationService: AuthenticationService,
+      private alertService: AlertService
   ) {
-    // redirect to home if already logged in
-    if (this.authenticationService.currentUserValue) {
-      this.router.navigate(['/']);
-    }
+      // redirect to home if already logged in
+      if (this.authenticationService.currentUserValue) {
+          this.router.navigate(['/']);
+      }
   }
 
   ngOnInit() {
-    this.loginForm = this.formBuilder.group({
-        username: ['', Validators.required],
-        password: ['', Validators.required]
-    });
+      this.loginForm = this.formBuilder.group({
+          username: ['', Validators.required],
+          password: ['', Validators.required]
+      });
 
-    // get return url from route parameters or default to '/'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-
-    if (this.route.snapshot.queryParams['registered']) {
-      this.success = 'Registration successful';
-    }
+      // get return url from route parameters or default to '/'
+      this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   // convenience getter for easy access to form fields
@@ -49,8 +44,8 @@ export class LoginComponent implements OnInit {
   onSubmit() {
       this.submitted = true;
 
-      this.error = null;
-      this.success = null;
+      // reset alerts on submit
+      this.alertService.clear();
 
       // stop here if form is invalid
       if (this.loginForm.invalid) {
@@ -65,9 +60,8 @@ export class LoginComponent implements OnInit {
                   this.router.navigate([this.returnUrl]);
               },
               error => {
-                  this.error = error;
+                  this.alertService.error(error);
                   this.loading = false;
               });
   }
-
 }

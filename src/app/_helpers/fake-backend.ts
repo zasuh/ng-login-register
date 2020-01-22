@@ -23,7 +23,11 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 case url.endsWith('/users/authenticate') && method === 'POST':
                     return authenticate();
                 case url.endsWith('/users/register') && method === 'POST':
-                  return register();
+                    return register();
+                case url.endsWith('/users') && method === 'GET':
+                    return getUsers();
+                case url.match(/\/users\/\d+$/) && method === 'DELETE':
+                    return deleteUser();
                 default:
                     // pass through any requests not handled above
                     return next.handle(request);
@@ -59,6 +63,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return ok();
         }
 
+        function getUsers() {
+            if (!isLoggedIn()) return unauthorized();
+            return ok(users);
+        }
+
+        function deleteUser() {
+            if (!isLoggedIn()) return unauthorized();
+
+            users = users.filter(x => x.id !== idFromUrl());
+            localStorage.setItem('users', JSON.stringify(users));
+            return ok();
+        }
+
         // helper functions
 
         function ok(body?) {
@@ -67,6 +84,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function error(message) {
             return throwError({ error: { message } });
+        }
+
+        function unauthorized() {
+            return throwError({ status: 401, error: { message: 'Unauthorised' } });
+        }
+
+        function isLoggedIn() {
+            return headers.get('Authorization') === 'Bearer fake-jwt-token';
+        }
+
+        function idFromUrl() {
+            const urlParts = url.split('/');
+            return parseInt(urlParts[urlParts.length - 1]);
         }
     }
 }
